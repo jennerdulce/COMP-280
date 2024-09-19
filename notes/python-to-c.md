@@ -143,3 +143,9 @@ do {
 ### Continue and Break
 - `break`: Gets out of Loop
 - `continue`: Continues the loop but skipping that particular iteration and whatever is after it within the code block
+
+### Boolean
+- Need to import
+```c
+#include <stdbool.h>
+```
