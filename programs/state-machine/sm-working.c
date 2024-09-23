@@ -11,6 +11,8 @@ int lineCount;
 int semicolonCount;
 int semicolonActualCount;
 int prevCh;
+int totalLines;
+int totalSloc;
 
 // States
 enum states {
@@ -148,12 +150,12 @@ void ProcessEscape(char ch){
             }
             currentState = string_found_state;
             previousState = normal_state;
-        case character_literal_found_state:
-            if(ch == 'n'){
-                ++lineCount;
-            }
-            currentState = character_literal_found_state; 
-            previousState = normal_state;
+        // case character_literal_found_state:
+        //     if(ch == 'n'){
+        //         ++lineCount;
+        //     }
+        //     currentState = character_literal_found_state; 
+        //     previousState = normal_state;
         case comment_found_state:
             if(prevCh == '\\' && ch == 'n'){
                 ++lineCount;
@@ -274,7 +276,9 @@ void ProcessEscape(char ch){
 
 void ProcessStar(char ch){
     switch (ch){
-        case '/': currentState = normal_state; break;
+        case '/': 
+            currentState = normal_state; 
+            break;
         default: currentState = normal_state;
     }   
 }
@@ -402,10 +406,15 @@ void ProcessSlash(char ch){
 }
 
 void ProcessComment(char ch){
+    int numCh = (int) ch;
+    if(numCh == 10){
+        lineCount++;
+        currentState = normal_state;
+    }
+
     switch (ch) {
         case ';':
             ++semicolonCount; 
-            printf("Semicolon Count: %d", semicolonCount);
             break;
         case '\\': 
             previousState = comment_found_state; currentState = escape_found_state; 
@@ -508,6 +517,11 @@ void ProcessComment(char ch){
 }
 
 void ProcessMultilineComment(char ch){
+    int numCh = (int) ch;
+    if(numCh == 10){
+        lineCount++;
+    }
+
     switch (ch) {
         case '*': currentState = star_found_state; break;
         case ';': ++semicolonCount; break;
@@ -606,11 +620,16 @@ void ProcessMultilineComment(char ch){
         case '|':
         case '}':
         case '~': break;
-        default: currentState = normal_state;
+        default: break;
     }
 }
 
 void ProcessNormalCharacter(char ch){
+    int numCh = (int) ch;
+    if(numCh == 10){
+        lineCount++;
+    }
+
     switch (ch) {
         case '"': 
             currentState = string_found_state; 
@@ -718,33 +737,44 @@ void ProcessNormalCharacter(char ch){
         case '|':
         case '}':
         case '~': break;
-        default: currentState = finish_state; break;
+        default: currentState = normal_state; break;
     }
 }
 
 void ProcessChar(char ch){
+    // printf("Current Char: %c \n", ch);
+    // printf("Current Char: %d \n", (int) ch);
     switch (currentState){
         case normal_state:
+            // printf("in a\n");
             ProcessNormalCharacter(ch);
             break;
         case character_literal_found_state:
+            // printf("in b\n");
             ProcessCharacterLiteral(ch);
             break;
         case comment_found_state:
+            // printf("in c\n");
             ProcessComment(ch);
             break;
         case escape_found_state:
+            // printf("in d\n");
             ProcessEscape(ch);
             break;
         case multiline_comment_found_state:
+            // printf("in e\n");
             ProcessMultilineComment(ch);
             break;
         case slash_found_state:
+            // printf("in f\n");
             ProcessSlash(ch);
+            break;
         case star_found_state:
+            // printf("in g\n");
             ProcessStar(ch);
             break;
         case string_found_state:
+            // printf("in h\n");
             ProcessString(ch);
             break;
         case finish_state: break;
@@ -756,6 +786,7 @@ void ProcessChar(char ch){
 
 void ProcessFile(FILE * f){
     int ch = fgetc(f);
+    // printf("Current Char: %c \n", (char) ch);
     while(ch != EOF){
         ProcessChar(ch);
         prevCh = ch;
@@ -767,7 +798,7 @@ void ProcessFile(FILE * f){
 int main(int argc, char * argv[]){
     if(argc == 1){
         ProcessFile(stdin);
-    } else if (argc == 2){
+    } else {
         for(int i = 1; i < argc; i++){ // Remove if necessary
             FILE * f = fopen(argv[i], "r");
             if(f == NULL){
@@ -776,12 +807,14 @@ int main(int argc, char * argv[]){
             } else {
                 ProcessFile(f);
             }
+            printf("%d %d %s\n", semicolonActualCount, lineCount, argv[i]);
+            totalLines += lineCount;
+            totalSloc += semicolonActualCount;
+            lineCount = 0;
+            semicolonActualCount = 0;
         }
-    } else {
-        perror("Error: Too many files.");
-        return 2;
     }
-    printf("%d %d %s\n", lineCount, semicolonActualCount, argv[1]);
-    printf("%d %d %d %s\n", lineCount, semicolonCount,semicolonActualCount, argv[1]);
+    printf("%d %d Total\n", totalSloc, totalLines );
+   
     return 0;
 }
