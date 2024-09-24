@@ -1,4 +1,5 @@
 // Assignment exercising states, switch, entering files, testing, and reading files.
+// cp /home/tburger/comp280/sloc_test_cases/*   .
 // rm sloc.c
 // vim sloc.c
 // gcc -o sloc sloc.c -Wall
