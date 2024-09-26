@@ -1,8 +1,19 @@
-// ./sm < input
-// cat input
-// echo takes from stdin (standard input)
-    // echo 1 0 -25 | ./quad
-// https://campuswire.com/c/GE8D46705/lectures/20
+// Assignment exercising states, switch, entering files, testing, and reading files.
+// cp /home/tburger/comp280/sloc_test_cases/*   .
+// rm sloc.c
+// vim sloc.c
+// gcc -o sloc sloc.c -Wall
+// ./sloc tc*.c
+
+// OUTPUT:
+// 0 2 tc1.c
+// 0 2 tc2.c
+// 1 2 tc3.c
+// 1 2 tc4.c
+// 1 2 tc5.c
+// 2 6 tc6.c
+// 3 2 tc7.c
+// 8 18 Total
 
 #include <stdio.h>
 
@@ -35,104 +46,12 @@ enum states previousState = normal_state;
 // Processing Functions
 void ProcessCharacterLiteral(char ch){
     switch (ch) {
-        case ' ':
-        case '!':
-        case '"': 
-        case '#':
-        case '$':
-        case '%':
-        case '&':
-        case '\'':
-        case '(':
-        case ')':
-        case '*':
-        case '+':
-        case ',':
-        case '-':
-        case '.':
-        case '/':
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case ':':
+        case '\\': previousState = currentState; currentState = escape_found_state; break;
+        case '`': currentState = normal_state; break;
         case ';': 
             ++semicolonCount; 
             break;
-        case '<':
-        case '=':
-        case '>':
-        case '?':
-        case '@':
-        case 'A':
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'E':
-        case 'F':
-        case 'G':
-        case 'H':
-        case 'I':
-        case 'J':
-        case 'K':
-        case 'L':
-        case 'M':
-        case 'N':
-        case 'O':
-        case 'P':
-        case 'Q':
-        case 'R':
-        case 'S':
-        case 'T':
-        case 'U':
-        case 'V':
-        case 'W':
-        case 'X':
-        case 'Y':
-        case 'Z':
-        case '[':
-        case '\\': previousState = currentState; currentState = escape_found_state; break;
-        case ']':
-        case '^':
-        case '_':
-        case '`': currentState = normal_state; break;
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
-        case 'g':
-        case 'h':
-        case 'i':
-        case 'j':
-        case 'k':
-        case 'l':
-        case 'm':
-        case 'n':
-        case 'o':
-        case 'p':
-        case 'q':
-        case 'r':
-        case 's':
-        case 't':
-        case 'u':
-        case 'v':
-        case 'w':
-        case 'x':
-        case 'y':
-        case 'z':
-        case '{':
-        case '|':
-        case '}':
-        case '~':
-        default: currentState = normal_state;
+        default: break;
     }
 }
 
@@ -144,133 +63,42 @@ void ProcessEscape(char ch){
             }
             currentState = normal_state;
             previousState = normal_state;
+            break;
         case string_found_state:
             if(ch == 'n'){
                 ++lineCount;
             }
             currentState = string_found_state;
             previousState = normal_state;
-        // case character_literal_found_state:
-        //     if(ch == 'n'){
-        //         ++lineCount;
-        //     }
-        //     currentState = character_literal_found_state; 
-        //     previousState = normal_state;
+            break;
+        case character_literal_found_state:
+            if(ch == 'n'){
+                ++lineCount;
+            }
+            currentState = character_literal_found_state; 
+            previousState = normal_state;
+            break;
         case comment_found_state:
             if(prevCh == '\\' && ch == 'n'){
                 ++lineCount;
                 currentState = normal_state;
                 previousState = normal_state;
             }
+            break;
         case multiline_comment_found_state:
             if(prevCh == '\\' && ch == 'n'){
                 ++lineCount;
                 currentState = multiline_comment_found_state;
                 previousState = normal_state;
             }
+            break;
         default: 
-            // currentState = string_found_state;
-            // previousState = normal_state;
+
             break;
     }
 
     switch (ch) {
-        case ' ':
-        case '!':
-        case '"':
-        case '#':
-        case '$':
-        case '%':
-        case '&':
-        case '\'':
-        case '(':
-        case ')':
-        case '*':
-        case '+':
-        case ',':
-        case '-':
-        case '.':
-        case '/':
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case ':':
-        case ';':
-        case '<':
-        case '=':
-        case '>':
-        case '?':
-        case '@':
-        case 'A':
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'E':
-        case 'F':
-        case 'G':
-        case 'H':
-        case 'I':
-        case 'J':
-        case 'K':
-        case 'L':
-        case 'M':
-        case 'N':
-        case 'O':
-        case 'P':
-        case 'Q':
-        case 'R':
-        case 'S':
-        case 'T':
-        case 'U':
-        case 'V':
-        case 'W':
-        case 'X':
-        case 'Y':
-        case 'Z':
-        case '[':
-        case '\\':
-        case ']':
-        case '^':
-        case '_':
-        case '`': 
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
-        case 'g':
-        case 'h':
-        case 'i':
-        case 'j':
-        case 'k':
-        case 'l':
-        case 'm':
-        case 'n':
-        case 'o':
-        case 'p':
-        case 'q':
-        case 'r':
-        case 's':
-        case 't':
-        case 'u':
-        case 'v':
-        case 'w':
-        case 'x':
-        case 'y':
-        case 'z':
-        case '{':
-        case '|':
-        case '}':
-        case '~': break;
-        default: currentState = normal_state;
+        default: break;
     }
 }
 
@@ -298,98 +126,7 @@ void ProcessString(char ch){
             previousState = currentState; 
             currentState = escape_found_state; 
             break;
-        case ' ':
-        case '!':
-        case '#':
-        case '$':
-        case '%':
-        case '&':
-        case '(':
-        case ')':
-        case '*':
-        case '+':
-        case ',':
-        case '-':
-        case '.':
-        case '/':
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case ':':
-        case '<':
-        case '=':
-        case '>':
-        case '?':
-        case '@':
-        case 'A':
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'E':
-        case 'F':
-        case 'G':
-        case 'H':
-        case 'I':
-        case 'J':
-        case 'K':
-        case 'L':
-        case 'M':
-        case 'N':
-        case 'O':
-        case 'P':
-        case 'Q':
-        case 'R':
-        case 'S':
-        case 'T':
-        case 'U':
-        case 'V':
-        case 'W':
-        case 'X':
-        case 'Y':
-        case 'Z':
-        case '[':
-        case ']':
-        case '^':
-        case '_':
-        case '`': 
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
-        case 'g':
-        case 'h':
-        case 'i':
-        case 'j':
-        case 'k':
-        case 'l':
-        case 'm':
-        case 'n':
-        case 'o':
-        case 'p':
-        case 'q':
-        case 'r':
-        case 's':
-        case 't':
-        case 'u':
-        case 'v':
-        case 'w':
-        case 'x':
-        case 'y':
-        case 'z':
-        case '{':
-        case '|':
-        case '}':
-        case '~': break;
-        default: currentState = normal_state;
+        default: break;
     }
 }
 
@@ -419,100 +156,7 @@ void ProcessComment(char ch){
         case '\\': 
             previousState = comment_found_state; currentState = escape_found_state; 
             break;
-        case ' ':
-        case '!':
-        case '"':
-        case '#':
-        case '$':
-        case '%':
-        case '&':
-        case '\'':
-        case '(':
-        case ')':
-        case '*':
-        case '+':
-        case ',':
-        case '-':
-        case '.':
-        case '/':
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case ':':
-        case '<':
-        case '=':
-        case '>':
-        case '?':
-        case '@':
-        case 'A':
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'E':
-        case 'F':
-        case 'G':
-        case 'H':
-        case 'I':
-        case 'J':
-        case 'K':
-        case 'L':
-        case 'M':
-        case 'N':
-        case 'O':
-        case 'P':
-        case 'Q':
-        case 'R':
-        case 'S':
-        case 'T':
-        case 'U':
-        case 'V':
-        case 'W':
-        case 'X':
-        case 'Y':
-        case 'Z':
-        case '[':
-        case ']':
-        case '^':
-        case '_':
-        case '`': 
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
-        case 'g':
-        case 'h':
-        case 'i':
-        case 'j':
-        case 'k':
-        case 'l':
-        case 'm':
-        case 'n':
-        case 'o':
-        case 'p':
-        case 'q':
-        case 'r':
-        case 's':
-        case 't':
-        case 'u':
-        case 'v':
-        case 'w':
-        case 'x':
-        case 'y':
-        case 'z':
-        case '{':
-        case '|':
-        case '}':
-        case '~': break;
-        default: currentState = normal_state;
+        default: break;
     }
 }
 
@@ -528,98 +172,6 @@ void ProcessMultilineComment(char ch){
         case '\\': 
             previousState = multiline_comment_found_state; currentState = escape_found_state; 
             break;
-        case ' ':
-        case '!':
-        case '"':
-        case '#':
-        case '$':
-        case '%':
-        case '&':
-        case '\'':
-        case '(':
-        case ')':
-        case '+':
-        case ',':
-        case '-':
-        case '.':
-        case '/':
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case ':':
-        case '<':
-        case '=':
-        case '>':
-        case '?':
-        case '@':
-        case 'A':
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'E':
-        case 'F':
-        case 'G':
-        case 'H':
-        case 'I':
-        case 'J':
-        case 'K':
-        case 'L':
-        case 'M':
-        case 'N':
-        case 'O':
-        case 'P':
-        case 'Q':
-        case 'R':
-        case 'S':
-        case 'T':
-        case 'U':
-        case 'V':
-        case 'W':
-        case 'X':
-        case 'Y':
-        case 'Z':
-        case '[':
-        case ']':
-        case '^':
-        case '_':
-        case '`': 
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
-        case 'g':
-        case 'h':
-        case 'i':
-        case 'j':
-        case 'k':
-        case 'l':
-        case 'm':
-        case 'n':
-        case 'o':
-        case 'p':
-        case 'q':
-        case 'r':
-        case 's':
-        case 't':
-        case 'u':
-        case 'v':
-        case 'w':
-        case 'x':
-        case 'y':
-        case 'z':
-        case '{':
-        case '|':
-        case '}':
-        case '~': break;
         default: break;
     }
 }
@@ -648,95 +200,6 @@ void ProcessNormalCharacter(char ch){
             break;
         case '`':
             currentState = character_literal_found_state; break; 
-        case ' ':
-        case '!':
-        case '#':
-        case '$':
-        case '%':
-        case '&':
-        case '(':
-        case ')':
-        case '*':
-        case '+':
-        case ',':
-        case '-':
-        case '.':
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case ':':
-        case '<':
-        case '=':
-        case '>':
-        case '?':
-        case '@':
-        case 'A':
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'E':
-        case 'F':
-        case 'G':
-        case 'H':
-        case 'I':
-        case 'J':
-        case 'K':
-        case 'L':
-        case 'M':
-        case 'N':
-        case 'O':
-        case 'P':
-        case 'Q':
-        case 'R':
-        case 'S':
-        case 'T':
-        case 'U':
-        case 'V':
-        case 'W':
-        case 'X':
-        case 'Y':
-        case 'Z':
-        case '[':
-        case ']':
-        case '^':
-        case '_':
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
-        case 'g':
-        case 'h':
-        case 'i':
-        case 'j':
-        case 'k':
-        case 'l':
-        case 'm':
-        case 'n':
-        case 'o':
-        case 'p':
-        case 'q':
-        case 'r':
-        case 's':
-        case 't':
-        case 'u':
-        case 'v':
-        case 'w':
-        case 'x':
-        case 'y':
-        case 'z':
-        case '{':
-        case '|':
-        case '}':
-        case '~': break;
         default: currentState = normal_state; break;
     }
 }
