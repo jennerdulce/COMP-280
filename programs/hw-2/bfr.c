@@ -1,37 +1,84 @@
-// Assignment exercising states, switch, entering files, testing, and reading files.
-
-// Terminal Commands used:
-// od -t x1 tracks.dat
-// cp /home/tburger/comp280/tracks.dat .
-// cp /home/tburger/comp280/tracks2.dat .
-// rm bfr.c
-// vim bfr.c
-// gcc -o bfr bfr.c -Wall
-// ./bfr tracks.c
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-int main(int argc, char * argv[]) {
-    FILE *f = fopen(argv[1], "r");
-    char record[16]; // Buffer to store each 16-byte record
-    int record_count = 5; // We are expecting 6 records
-    
-    // Loop through and read each record
-    for (int i = 0; i < record_count; i++) {
-        // Read exactly 16 bytes from the file into the buffer 'record'
-        fread(record, sizeof(char), 16, f);
-        
-        // Output the record (optionally handle it in a different way)
-        printf("Record %d: ", i + 1);
-        for (int j = 0; j < 16; j++) {
-            printf("%02x ", (unsigned char)record[j]); // Print each byte in hexadecimal format
-        }
-        printf("\n");
+typedef struct Record{
+    float latitude;
+    float longitude;
+    short altitude;
+    char name[5];
+    unsigned char misc;
+} Record;
+
+void processID(int id){
+    printf("id:");
+    switch(id){
+        case 0:
+            printf("unknown ");
+            break;
+        case 1:
+            printf("friend ");
+            break;
+        case 2:
+            printf("foe ");
+            break;
+        case 3:
+            printf("neutral ");
+            break;
+    }
+}
+
+void processCategory(int cat){
+    printf("cat:");
+    switch(cat){
+        case 0:
+            printf("ship ");
+            break;
+        case 1:
+            printf("ground vehicle ");
+            break;
+        case 2:
+            printf("airplane ");
+            break;
+    }
+}
+
+void processEngaged(int engaged){
+    switch(engaged){
+        case 0:
+
+        case 1:
+            printf("engaged");
+            break;
     }
 
-    // Close the file
-    fclose(f);
-    
+}
+
+int main(int argc, char * argv[]) {
+    if(argc == 2){
+        FILE * f = fopen(argv[1], "r");
+        if(f == NULL){
+            perror("Error: No file found.");
+            return 1;
+        } else {
+            Record record;
+            while(fread(&record, sizeof(Record), 1, f) == 1){
+                int id = record.misc & 0b11;
+                int category = (record.misc >> 2) & 0b11;
+                int engaged = (record.misc >> 4) & 0b01;
+
+                printf("lat:%f ", record.latitude);
+                printf("lon:%f ", record.longitude);
+                printf("alt:%d ", record.altitude);
+                printf("name:%s ", record.name);
+                processID(id);
+                processCategory(category);
+                processEngaged(engaged);
+                printf("\n");
+            }
+        }
+    } else {
+        perror("Error: Too many files.");
+    }
     return 0;
 }
