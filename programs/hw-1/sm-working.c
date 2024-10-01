@@ -1,5 +1,5 @@
 // Assignment exercising states, switch, entering files, testing, and reading files.
-// cp /home/tburger/comp280/sloc_test_cases/*   .
+// cp /home/tburger/comp280/sloc_test_cases/* .
 // rm sloc.c
 // vim sloc.c
 // gcc -o sloc sloc.c -Wall
@@ -261,6 +261,7 @@ void ProcessFile(FILE * f){
 int main(int argc, char * argv[]){
     if(argc == 1){
         ProcessFile(stdin);
+        printf("%d %d\n", semicolonActualCount, lineCount);
     } else {
         for(int i = 1; i < argc; i++){ // Remove if necessary
             FILE * f = fopen(argv[i], "r");
@@ -276,8 +277,9 @@ int main(int argc, char * argv[]){
             lineCount = 0;
             semicolonActualCount = 0;
         }
+        if(argc >= 3){
+            printf("%d %d Total\n", totalSloc, totalLines );
+        }
     }
-    printf("%d %d Total\n", totalSloc, totalLines );
-   
     return 0;
 }
