@@ -3,11 +3,11 @@
 #include <string.h>
 
 typedef struct Record{
-    float latitude;
-    float longitude;
-    short altitude;
-    char name[5];
-    unsigned char misc;
+    float latitude; // 4 bytes
+    float longitude; // 4 bytes
+    short altitude; // 2 bytes
+    char name[5]; // 5 bytes
+    unsigned char misc; // 1 bytes
 } Record;
 
 void processID(int id){
@@ -63,9 +63,10 @@ int main(int argc, char * argv[]) {
         } else {
             Record record;
             while(fread(&record, sizeof(Record), 1, f) == 1){
-                int id = record.misc & 0b11;
-                int category = (record.misc >> 2) & 0b11;
-                int engaged = (record.misc >> 4) & 0b01;
+                // fread returns 1 or a 0; 1 = data; 0 = no data / EOF
+                int id = record.misc & 0b11; // 0x3
+                int category = (record.misc >> 2) & 0b11; // 0x3
+                int engaged = (record.misc >> 4) & 0b01; // 0x10
 
                 printf("lat:%f ", record.latitude);
                 printf("lon:%f ", record.longitude);

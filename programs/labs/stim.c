@@ -27,19 +27,22 @@ void decode(Datagram *dg, uint8_t buffer[])
     if((buffer[7] >> 7) == 1){
         AR_0z = 0xff;
     }
-
+    // &buffer[1] covers 1-3
+    // AR_0x adds an extra byte to the 3 byte / 24 bit increasing to a 4 byte / 32 bit integer
     uint8_t AR_1x = buffer[1];
     uint8_t AR_2x = buffer[2];
     uint8_t AR_3x = buffer[3];
     int32_t x = (AR_0x << 24) | (AR_1x << 16) | (AR_2x << 8) | AR_3x;
     dg->xAxisGyro = x / 16384.0;
 
+    // &buffer[4] covers 4-6
     uint8_t AR_1y = buffer[4];
     uint8_t AR_2y = buffer[5];
     uint8_t AR_3y = buffer[6];
     int32_t y = (AR_0y << 24) | (AR_1y << 16) | (AR_2y << 8) | AR_3y;
     dg->yAxisGyro = y / 16384.0;
 
+    // &buffer[7] covers 7-9
     uint8_t AR_1z = buffer[7];
     uint8_t AR_2z = buffer[8];
     uint8_t AR_3z = buffer[9];
@@ -47,6 +50,7 @@ void decode(Datagram *dg, uint8_t buffer[])
     dg->zAxisGyro = z / 16384.0;
 
     // Byte 11 of message focusing 6 bit if 1 on that 6th bit then start up if 0 the okay
+    //       7654 3210
     // 0x40: 0100 0000
     dg->startup = (buffer[10] & 0x40) != 0;
 }
