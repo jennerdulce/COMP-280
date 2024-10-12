@@ -2,15 +2,14 @@
 #include <stdlib.h>
 
 typedef struct Record {
-    // 5 Words:
+    // 4 Words:
     // 1. P - Parity
     // 2. SSM - Sign / Status MAtrix
     // 3. Data
     // 4. SDI - Souce / Destination Identifier
     // 5. Label - Identifies the Data Type
     // Each word is 4 bytes in length
-    // or 32 bits in length
-    // Message is in Big Endian Format
+        // or 32 bits in length
     unsigned int parity:1;
     unsigned int smm:2;
     unsigned int data:19;
@@ -18,13 +17,17 @@ typedef struct Record {
     unsigned int label:8;
 } Record;
 
-// decimals and negatives are not working
 unsigned int floatToBinary(float f) {
-    unsigned int altitude = (unsigned int) (f * 8); //1001011.01 to 100101101
+     //1001011.01 to 100101101
+    unsigned int altitude = (unsigned int) (f * 8);
+
+    // Handling negatives
     if(altitude < 0) {
         altitude = (1 << 19) + altitude;
     }
-    return altitude & 0x7FFFF; // Masking 19 bits
+
+    // 0111 1111 1111 1111 1111
+    return altitude & 0x7FFFF; // Masking 19 bits that we need
 }
 
 unsigned int setParity(Record record) {
@@ -73,48 +76,22 @@ void printMessage(Record record) {
     printf("%02x %02x %02x %02x\n",(message >> 24) & 0xFF, (message >> 16) & 0xFF, (message >> 8) & 0xFF, message & 0xFF);     
 }
 
-
-
-// int main(int argc, char * argv[]) {
-//     if(argc == 2){
-//         FILE * f = fopen(argv[1], "r");
-//         if(f == NULL){
-//             perror("Error: No file found.");
-//             return 1;
-//         } else {
-//             Record record;
-//             while(fread(&record, 32, 1, f) == 1) {
-//                 // Read in as a float
-//                 // 75.25
-//                 // 60 09 68 b1
-//                 record.parity = 0;
-//                 record.smm = 0b11;
-//                 record.data = floatToBinary(record.data);
-//                 record.sdi = 0b00;
-//                 record.label = 0xFF;
-//                 // Process into a Binary String
-//                 // Print out in hex format
-//             }
-//         } 
-//     } else {
-//         perror("Error: Too many files.");
-//     }
-//     return 0;
-// }
-
 int main(int argc, char * argv[]) {
     Record record;
     float altitudes[] = {135.7, 1.0, -0.5, 0.0, 75.25, -1.5};
     for(int i = 0; i < 6; i++){
-        printf("%f ", altitude[i]);
+        printf("%f ", altitudes[i]);
+
+        // Create Binary String
         record.smm = 0b11;
         record.sdi = 0b00;
         record.data = floatToBinary(altitudes[i]);
         record.label = 0xb1;
+
         //  Count Total number of 1s for Parity
         record.parity = setParity(record);
         
-        // Print Hex
+        // Convert Binary To Hex
         printMessage(record);
     }
     
