@@ -4,7 +4,7 @@
 #include "memory_parameters.h"
 #include <string.h>
 
-unsigned char dram[48000];
+unsigned char dram[49125];
 
 word_t read_word(address_t addr){
     if((addr & 3) != 0){
@@ -26,22 +26,27 @@ word_t read_word(address_t addr){
 void write_word(address_t addr, word_t value){
     if((addr & 3) != 0){
         alignment_error(addr);
+        return;
     }
 
     if(addr >= MEMORY_SIZE){
         address_error(addr);
+        return;
     }
 
     memcpy(&dram[addr], &value, 4);
+    trace_write_word(addr, value);
 }
 
 void read_line(address_t addr, cache_line_t line){
-    if((addr & 3) != 0){
+    if((addr & 0x1F) != 0){
         alignment_error(addr);
+        return;
     }
 
     if(addr >= MEMORY_SIZE){
         address_error(addr);
+        return;
     }
 
     int totalWords = (CACHE_LINE_SIZE / sizeof(word_t));
@@ -56,12 +61,14 @@ void read_line(address_t addr, cache_line_t line){
 }
 
 void write_line(address_t addr, cache_line_t line){
-    if((addr & 3) != 0){
+    if((addr & 0x1F) != 0){
         alignment_error(addr);
+        return;
     }
 
     if(addr >= MEMORY_SIZE){
         address_error(addr);
+        return;
     }
     int totalWords = (CACHE_LINE_SIZE / sizeof(word_t));
 
@@ -75,5 +82,5 @@ void write_line(address_t addr, cache_line_t line){
 }
 
 void dram_clear(){
-    memset(&dram, 0, 48000);
+    memset(&dram, 0, 49152);
 }
