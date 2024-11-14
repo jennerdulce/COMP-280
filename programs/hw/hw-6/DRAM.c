@@ -4,7 +4,7 @@
 #include "memory_parameters.h"
 #include <string.h>
 
-unsigned char dram[49125];
+unsigned char dram[49152];
 
 word_t read_word(address_t addr){
     if((addr & 3) != 0){
@@ -70,6 +70,8 @@ void write_line(address_t addr, cache_line_t line){
         address_error(addr);
         return;
     }
+
+    int originalAddr = addr;
     int totalWords = (CACHE_LINE_SIZE / sizeof(word_t));
 
     for(int i = 0; i < totalWords; i++){
@@ -78,7 +80,7 @@ void write_line(address_t addr, cache_line_t line){
         line = line + sizeof(word_t);
     }
 
-    trace_write_line(addr, line);
+    trace_write_line(originalAddr, line);
 }
 
 void dram_clear(){
