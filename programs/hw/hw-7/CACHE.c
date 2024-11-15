@@ -12,7 +12,6 @@ typedef struct Line{
     uint8_t data[32]; // Assuming 32 bytes per cache line
     int time; 
 } Line;
-
 struct Line cache[NUM_SETS][N_WAY]; // 4 sets, 2 way, these variables are defined in the cache.h file 
 void cache_init(){
     for(int cacheSet = 0; cacheSet < NUM_SETS; cacheSet++){

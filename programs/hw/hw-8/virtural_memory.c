@@ -9,11 +9,10 @@
 #define TLB_SIZE 2
 
 typedef struct tlb_entry_t{
-   address_t vpn; // time of last access
+   address_t virtual_addr; // virtual address
+   address_t physical_addr; // physical address
    page_table_entry_t pte;
 } tlb_entry_t;
-
-static int round_robin = 0;
 
 // We have an array [tlb_entry1, tlb_entry2]
 static tlb_entry_t tlb[TLB_SIZE]; // Translation Lookaside Buffer (TLB)
@@ -31,7 +30,6 @@ void vm_disable(){
 void vm_enable(address_t page_table){
    current_page_table_address = page_table;
    vm_enabled = 1;
-   memset(TLB, 0, sizeof(tlb));
 }
 
 word_t vm_read_word(address_t addr){
@@ -42,14 +40,10 @@ word_t vm_read_word(address_t addr){
        return cache_read_word(addr);
     } else {
         // VM Enabled
-        // Check TLB CHECKER: for page table entry
-            // Check VPN Virtural Page Number
-        address_t vpn = (addr >> 10) & 0x3FFFFF;
-        address_t offset = addr & 0x3FF;
-        
+        // Check TLB for page table entry
         for(int i = 0; i < TLB_SIZE; i++){
-            if(tlb[i].pte.valid && tlb[i].vpn == vpn){
-                // TBL HIT;
+            if(tlb[i].virtual_addr == addr){
+                // TLB HIT
                 tlb[i].time = current_time++; // Update access time
                 address_t physical_addr = tlb[i].physical_addr;
                 return cache_read_word(physical_addr);
