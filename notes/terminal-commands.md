@@ -9,3 +9,4 @@
     - `hello.c`: file to be opened
     - `-Wall`: Enable reporting of all warnings
 - `./hello`: runs the program
+- `gcc -o dot dot.c -Wall  `
