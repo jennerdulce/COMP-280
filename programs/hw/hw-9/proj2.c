@@ -22,7 +22,7 @@ void sigchld_handler(int sig) {
     // Reap completed background processes
     while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
         if (WIFEXITED(status)) {
-            printf("Background process exited with status %d\n",  WEXITSTATUS(status));
+            printf("Background process exited normally with exit code %d\n",  WEXITSTATUS(status));
         } else if (WIFSIGNALED(status)) {
             printf("Background process terminated by signal %d\n",  WTERMSIG(status));
         }
@@ -30,14 +30,21 @@ void sigchld_handler(int sig) {
 }
 
 void execute_command(struct CommandLine *command) {
-    if (command->argCount == 0) return;
+    if (command->argCount > 0 && strcmp(command->arguments[0], "exit") == 0){
+        freeCommand(command);
+        exit(0);
+    }
 
-    if (strcmp(command->arguments[0], "cd") == 0) {
+    if (command->argCount > 0 && strcmp(command->arguments[0], "cd") == 0) {
         // CD
-        if (command->argCount < 2) {
-            fprintf(stderr, "cd: missing argument\n");
-        } else if (chdir(command->arguments[1]) != 0) {
-            perror("cd");
+        if(command->argCount == 1){
+            chdir(getenv("HOME"));
+        } else if (command->argCount == 2) {
+            if (chdir(command->arguments[1]) != 0) {
+                perror("cd");
+            }
+        } else {
+            printf("cd: too many arguments\n");
         }
         
     } else {
@@ -50,7 +57,7 @@ void execute_command(struct CommandLine *command) {
             } else if (pid > 0) {
                 // Parent
                 if (command->background) {
-                    printf("Started background process %d\n", pid);
+                    printf("Background process started %d\n", pid);
                 } else {
                     waitpid(pid, NULL, 0);
                 }
@@ -75,7 +82,7 @@ int main(int argc, const char **argv) {
         }
 
         printf("> ");
-        if (fgets(cmdline, MAX_LINE_LENGTH, stdin) == NULL) {
+        if (fgets(cmdline, sizeof(cmdline), stdin) == NULL) {
             if (feof(stdin)) {
                 exit(0);
             }
