@@ -25,7 +25,7 @@
 - mov
     - l
     - w
-    - q - 64 bit - address or int
+    - q - 64 bit - address or int, unsi long, si long
     - z
     - w - 16 bits - short
 
@@ -44,3 +44,8 @@ movq -8(%rbp), %rax
 movq -8(%rbp), %rax
 movq -8(%rbp), %rax
 movl $18, 12(%rax)
+
+unnamed semaphore,
+declare variable and put it in a place is shared memory
+
+using sermaphores between threads in a process, everything is shared. you dont ahve to put it anywhere
